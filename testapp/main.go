@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/efthakhar/golab/randomsentences"
+	//"github.com/efthakhar/golab/golarr"
 )
 
 func main() {
-	fmt.Println(randomsentences.Random())
-	fmt.Println(randomsentences.Random2())
+	
+	fmt.Println("Hello From Test Application")
 }
