@@ -1,0 +1,53 @@
+package main
+
+import (
+    "fmt"
+    "log"
+    "net/http"
+)
+
+type Middleware func(http.Handler) http.Handler
+
+func ChainMiddleware(h http.Handler, middlewares ...Middleware) http.Handler {
+    for _, m := range middlewares {
+        h = m(h)
+    }
+    return h
+}
+
+func LoggingMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        log.Printf("Logging: %s %s", r.Method, r.URL.Path)
+        next.ServeHTTP(w, r)
+    })
+}
+
+func AuthMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        log.Println("Auth check passed")
+        next.ServeHTTP(w, r)
+    })
+}
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintln(w, "Hello, world!")
+}
+
+func main() {
+    // Step 1: Define your global middleware group (like Laravel middleware group)
+    globalMiddlewares := []Middleware{
+        LoggingMiddleware,
+        AuthMiddleware,
+    }
+
+    // Step 2: Register handlers
+    mux := http.NewServeMux()
+    mux.HandleFunc("/hello", helloHandler)
+
+    // Step 3: Apply global middleware to mux
+    wrappedMux := ChainMiddleware(mux, globalMiddlewares...)
+
+    // Step 4: Start server
+    log.Println("Listening on :8080")
+    http.ListenAndServe(":8080", wrappedMux)
+}
