@@ -13,5 +13,3 @@ func NewApplication(name string, mode string) *Application {
 	}
 
 }
-
-

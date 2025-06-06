@@ -17,12 +17,11 @@ func main() {
 	fmt.Println(application.Name)
 
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		helpers.NetHttpJsonResponse(w, map[string]string{"msg": "From helper!"}, 404)
 	})
 
-
-	
 
 	http.ListenAndServe(":8080", mux)
 
